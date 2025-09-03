@@ -2,15 +2,15 @@
 
 ## Diagrams
 
-### Entitiy-relation diagram
+### Entitiy-relation diagram (Current implementation)
 
 ![ERD](./docs/erd.png)
 
-### Transaction diagram
+### Transaction diagram (Current implementation)
 
 ![Transaction sequence diagram](./docs/seq_trx.svg)
 
-### Components
+### Components (Ideal architecture)
 
 ![Components](./docs/components.png)
 
