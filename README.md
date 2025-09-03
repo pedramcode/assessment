@@ -8,4 +8,4 @@
 
 ### Transaction diagram
 
-![Transaction sequence diagram](./docs/seq1.svg)
+![Transaction sequence diagram](./docs/seq_trx.svg)
