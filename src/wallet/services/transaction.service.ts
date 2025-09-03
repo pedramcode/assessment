@@ -93,6 +93,12 @@ export default class TransactionService {
     }
   }
 
+  async checkWithdrawAllowed(companyId: string, amount: number) {
+    await this.companyService.get(companyId);
+    const balance = await this.getBalanceCached(companyId);
+    return balance! - amount >= 0;
+  }
+
   async getBalanceCached(companyId: string): Promise<number | undefined> {
     return this.cache.get<number>(`BALANCE_${companyId}`);
   }

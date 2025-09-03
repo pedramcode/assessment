@@ -9,6 +9,7 @@ import { CompanyModule } from 'src/company/company.module';
   imports: [TypeOrmModule.forFeature([Transaction]), CompanyModule],
   providers: [TransactionService],
   controllers: [TransactionController],
+  exports: [TransactionService],
 })
 export class WalletModule implements OnModuleInit {
   constructor(private readonly trxService: TransactionService) {}

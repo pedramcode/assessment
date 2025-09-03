@@ -1,4 +1,28 @@
 services:
+  assessment:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: assessment-service
+    restart: on-failure
+    environment:
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USER=admin
+      - DATABASE_PASSWORD=admin
+      - DATABASE_NAME=assessment
+      - ENVIRONMENT=dev
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - 3000:3000
+    volumes:
+      - ./src:/app/src
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - assessment_net
+
   postgres:
     image: postgres:16-alpine
     container_name: assessment-postgres

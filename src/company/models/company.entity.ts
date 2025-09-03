@@ -1,3 +1,4 @@
+import Card from 'src/card/entities/card.entity';
 import BaseModel from 'src/common/models/BaseModel';
 import Plan from 'src/plan/entities/plan.entitiy';
 import Transaction from 'src/wallet/entities/transaction.entitiy';
@@ -39,4 +40,7 @@ export default class Company extends BaseModel {
 
   @OneToMany(() => Transaction, (obj) => obj.company)
   transactions: Transaction[];
+
+  @OneToMany(() => Card, (obj) => obj.company)
+  cards: Card[];
 }

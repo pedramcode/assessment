@@ -35,7 +35,10 @@ export default class CompanyService {
   }
 
   async get(id: string) {
-    const company = await this.companyRepo.findOne({ where: { id } });
+    const company = await this.companyRepo.findOne({
+      where: { id },
+      relations: ['plan'],
+    });
     if (!company) {
       throw new NotFoundException('company not found');
     }
@@ -55,6 +58,15 @@ export default class CompanyService {
   async getAllUnsafe() {
     const company = await this.companyRepo.find();
     return company;
+  }
+
+  async getActivePlan(id: string): Promise<Plan | undefined> {
+    const company = await this.get(id);
+    if (!company.plan) {
+      return undefined;
+    }
+    const plan = await this.planService.get(company.plan.id);
+    return plan;
   }
 
   async update(id: string, data: CompanyUpdateDto) {
