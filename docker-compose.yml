@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: assessment-postgres
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=assessment
+    volumes:
+      - assessment_pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    ports:
+      - 5454:5432
+    networks:
+      - assessment_net
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: assessment-pgadmin
+    restart: unless-stopped
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@mail.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - 15454:80
+    depends_on:
+      - postgres
+    networks:
+      - assessment_net
+
+networks:
+  assessment_net:
+    driver: bridge
+volumes:
+  assessment_pgdata:
