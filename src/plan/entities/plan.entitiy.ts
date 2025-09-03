@@ -2,6 +2,7 @@ import BaseModel from 'src/common/models/BaseModel';
 import Company from 'src/company/models/company.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 
+// add any other limitation for plan as columns
 @Entity()
 export default class Plan extends BaseModel {
   @Column({
