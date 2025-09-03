@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import Transaction from './entities/transaction.entitiy';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import TransactionController from './controllers/transaction.controller';
@@ -10,4 +10,10 @@ import { CompanyModule } from 'src/company/company.module';
   providers: [TransactionService],
   controllers: [TransactionController],
 })
-export class WalletModule {}
+export class WalletModule implements OnModuleInit {
+  constructor(private readonly trxService: TransactionService) {}
+
+  onModuleInit() {
+    void this.trxService.updateCacheAll();
+  }
+}

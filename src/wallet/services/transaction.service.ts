@@ -1,10 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import Transaction, { TransactionType } from '../entities/transaction.entitiy';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import TransactionCreateDto from '../dto/transaction.create';
 import TransactionUpdateDto from '../dto/transaction.update';
 import CompanyService from 'src/company/company.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export default class TransactionService {
@@ -12,22 +14,30 @@ export default class TransactionService {
     @InjectRepository(Transaction)
     private readonly trxRepo: Repository<Transaction>,
     private readonly companyService: CompanyService,
+    @Inject(CACHE_MANAGER) private readonly cache: Cache,
   ) {}
 
   async create(data: TransactionCreateDto) {
     const company = await this.companyService.get(data.companyId);
-    return this.trxRepo.save({
+    const res = await this.trxRepo.save({
       ...data,
       company,
     });
+    void this.updateCacheCompany(company.id);
+    return res;
   }
 
   async delete(id: string) {
-    const trx = await this.trxRepo.findOne({ where: { id } });
+    const trx = await this.trxRepo.findOne({
+      where: { id },
+      relations: ['company'],
+    });
     if (!trx) {
       throw new NotFoundException('transaction not found');
     }
-    return this.trxRepo.remove(trx);
+    const res = await this.trxRepo.remove(trx);
+    void this.updateCacheCompany(trx.company.id);
+    return res;
   }
 
   async get(id: string) {
@@ -52,16 +62,39 @@ export default class TransactionService {
   }
 
   async update(id: string, data: TransactionUpdateDto) {
-    const trx = await this.trxRepo.findOne({ where: { id } });
+    const trx = await this.trxRepo.findOne({
+      where: { id },
+      relations: ['company'],
+    });
     if (!trx) {
       throw new NotFoundException('transaction not found');
     }
     const company = await this.companyService.get(data.companyId);
-    return this.trxRepo.save({
+    const res = await this.trxRepo.save({
       ...trx,
       ...data,
       company,
     });
+    if (data.amount !== trx.amount) {
+      void this.updateCacheCompany(trx.company.id);
+    }
+    return res;
+  }
+
+  async updateCacheCompany(companyId: string) {
+    const balance = await this.getBalance(companyId);
+    await this.cache.set(`BALANCE_${companyId}`, balance);
+  }
+
+  async updateCacheAll() {
+    const companies = await this.companyService.getAllUnsafe();
+    for (const company of companies) {
+      await this.updateCacheCompany(company.id);
+    }
+  }
+
+  async getBalanceCached(companyId: string): Promise<number | undefined> {
+    return this.cache.get<number>(`BALANCE_${companyId}`);
   }
 
   async getBalance(companyId: string) {

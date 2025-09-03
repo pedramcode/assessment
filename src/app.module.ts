@@ -18,10 +18,10 @@ import { CacheModule } from '@nestjs/cache-manager';
 @Module({
   imports: [
     CacheModule.registerAsync({
+      isGlobal: true,
       inject: [SettingService],
       useFactory: (settingService: SettingService) => ({
         store: new KeyvRedis(settingService.redis_url),
-        ttl: 60000, // ttl ms
       }),
     }),
     ConfigModule.forRoot({

@@ -52,6 +52,11 @@ export default class CompanyService {
     return company;
   }
 
+  async getAllUnsafe() {
+    const company = await this.companyRepo.find();
+    return company;
+  }
+
   async update(id: string, data: CompanyUpdateDto) {
     const company = await this.companyRepo.findOne({ where: { id } });
     if (!company) {

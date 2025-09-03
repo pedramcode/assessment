@@ -88,7 +88,7 @@ export default class TransactionController {
     summary: 'get balance of company',
   })
   async getBalace(@Param('companyId') companyId: string) {
-    return this.trxService.getBalance(companyId);
+    return this.trxService.getBalanceCached(companyId);
   }
 
   @Get()
