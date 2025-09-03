@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import Transaction from '../entities/transaction.entitiy';
+import Transaction, { TransactionType } from '../entities/transaction.entitiy';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import TransactionCreateDto from '../dto/transaction.create';
@@ -61,6 +61,29 @@ export default class TransactionService {
       ...trx,
       ...data,
       company,
+    });
+  }
+
+  async getBalance(companyId: string) {
+    await this.companyService.get(companyId);
+    return await this.trxRepo.manager.transaction(async (manager) => {
+      const depositSum: { sum: number } | undefined = await manager
+        .createQueryBuilder('Transaction', 'trx')
+        .select('COALESCE(SUM(trx.amount), 0)', 'sum')
+        .where('trx.companyId = :companyId', { companyId })
+        .andWhere('trx.type = :type', { type: TransactionType.deposit })
+        .getRawOne();
+
+      const withdrawSum: { sum: number } | undefined = await manager
+        .createQueryBuilder('Transaction', 'trx')
+        .select('COALESCE(SUM(trx.amount), 0)', 'sum')
+        .where('trx.companyId = :companyId', { companyId })
+        .andWhere('trx.type = :type', { type: TransactionType.withdraw })
+        .getRawOne();
+
+      const deposit = depositSum?.sum ?? 0;
+      const withdraw = withdrawSum?.sum ?? 0;
+      return { balance: Number(deposit) - Number(withdraw) };
     });
   }
 }

@@ -76,6 +76,21 @@ export default class TransactionController {
     return this.trxService.get(id);
   }
 
+  @Get('/balance/:companyId')
+  @ApiParam({
+    name: 'companyId',
+    type: 'string',
+    required: true,
+    description: 'company id to calculate balance',
+  })
+  @ApiOperation({
+    description: 'calculate balance of company',
+    summary: 'get balance of company',
+  })
+  async getBalace(@Param('companyId') companyId: string) {
+    return this.trxService.getBalance(companyId);
+  }
+
   @Get()
   @ApiQuery({
     name: 'page',

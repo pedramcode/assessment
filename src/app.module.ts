@@ -8,13 +8,22 @@ import { CommonModule } from './common/common.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import SettingService from './common/services/setting.service';
+import KeyvRedis from '@keyv/redis';
 
 import Company from './company/models/company.entity';
 import Plan from './plan/entities/plan.entitiy';
 import Transaction from './wallet/entities/transaction.entitiy';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
+    CacheModule.registerAsync({
+      inject: [SettingService],
+      useFactory: (settingService: SettingService) => ({
+        store: new KeyvRedis(settingService.redis_url),
+        ttl: 60000, // ttl ms
+      }),
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',

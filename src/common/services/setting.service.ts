@@ -28,4 +28,8 @@ export default class SettingService {
   public get environment(): 'dev' | 'prod' {
     return this.configService.get('ENVIRONMENT') === 'dev' ? 'dev' : 'prod';
   }
+
+  public get redis_url(): string {
+    return this.configService.get('REDIS_URL') ?? '';
+  }
 }
