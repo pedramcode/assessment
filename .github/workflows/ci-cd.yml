@@ -83,10 +83,10 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t myusername/assessment:${{ github.sha }} .
-          docker tag myusername/assessment:${{ github.sha }} myusername/assessment:latest
+          docker build -t pedramcode/assessment:${{ github.sha }} .
+          docker tag pedramcode/assessment:${{ github.sha }} pedramcode/assessment:latest
 
       - name: Push Docker image
         run: |
-          docker push myusername/assessment:${{ github.sha }}
-          docker push myusername/assessment:latest
+          docker push pedramcode/assessment:${{ github.sha }}
+          docker push pedramcode/assessment:latest
